@@ -1,0 +1,17 @@
+# dependencias y build
+/node_modules
+/dist
+/coverage
+*.tsbuildinfo
+
+# secretos: NUNCA commitear
+.env
+
+# PDFs subidos (datos de menores: no van al repo)
+storage/
+
+# varios
+.DS_Store
+*.log
+.idea/
+.vscode/
