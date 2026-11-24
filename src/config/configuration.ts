@@ -13,7 +13,8 @@ export interface AppConfig {
     name: string;
     user: string;
     password: string;
-    synchronize: boolean;
+    ssl: boolean;
+    migrationsRun: boolean;
   };
   sso: {
     baseUrl: string;
@@ -65,7 +66,8 @@ export const configuration = (): AppConfig => {
       name: env.DB_NAME ?? '',
       user: env.DB_USER ?? '',
       password: env.DB_PASSWORD ?? '',
-      synchronize: (env.DB_SYNCHRONIZE ?? 'false') === 'true',
+      ssl: (env.DB_SSL ?? 'false') === 'true',
+      migrationsRun: (env.DB_MIGRATIONS_RUN ?? 'false') === 'true',
     },
     sso: {
       baseUrl: ssoBaseUrl,

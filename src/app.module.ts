@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { OriginGuard } from './common/guards/origin.guard';
 import { AppConfig, configuration } from './config/configuration';
 import { validateEnv } from './config/env.validation';
+import { buildDataSourceOptions } from './database/typeorm-options';
 import { DirectoryModule } from './directory/directory.module';
 import { FilesModule } from './files/files.module';
 import { FoldersModule } from './folders/folders.module';
@@ -20,16 +21,7 @@ import { StorageModule } from './storage/storage.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService<AppConfig, true>) => {
         const db = config.get('database', { infer: true });
-        return {
-          type: 'postgres' as const,
-          host: db.host,
-          port: db.port,
-          database: db.name,
-          username: db.user,
-          password: db.password,
-          autoLoadEntities: true,
-          synchronize: db.synchronize,
-        };
+        return { ...buildDataSourceOptions(db), migrationsRun: db.migrationsRun };
       },
     }),
     SsoModule,

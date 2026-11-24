@@ -1,7 +1,7 @@
 # dependencias y build
-/node_modules
-/dist
-/coverage
+node_modules/
+dist/
+coverage/
 *.tsbuildinfo
 
 # secretos: NUNCA commitear

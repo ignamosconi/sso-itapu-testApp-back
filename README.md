@@ -9,6 +9,7 @@ Los PDFs se organizan en carpetas arbitrarias definidas por el admin; cada carpe
 cp .env.example .env        # completá SSO_CLIENT_ID / SSO_CLIENT_SECRET / DB_PASSWORD
 npm install
 npm run db:up               # Postgres en Docker (única pieza dockerizada)
+npm run migration:run       # crea las tablas (o dejá DB_MIGRATIONS_RUN=true y se aplican al arrancar)
 npm run start:dev           # http://localhost:3001/api  ·  Swagger: /api/docs
 ```
 
@@ -22,6 +23,9 @@ El SSO tiene que estar corriendo en `SSO_BASE_URL` (por defecto `http://localhos
 | `npm test` / `npm run test:cov` | Tests unitarios (jest) |
 | `npm run build` | Compila a `dist/` |
 | `npm run db:up` / `db:down` / `db:logs` | Postgres en Docker |
+| `npm run migration:run` / `migration:revert` / `migration:show` | Aplicar, deshacer o listar migraciones |
+| `npm run migration:generate -- src/database/migrations/NombreDelCambio` | Genera una migración comparando las entidades con la base |
+| `npm run migration:prod` | Aplica las migraciones desde `dist/` (después de `npm run build`; para CI/producción) |
 
 ## Arquitectura
 
@@ -56,6 +60,22 @@ Los servicios reciben sus dependencias por token (`@Inject(FOLDER_REPOSITORY)`),
 
 Detalle y DTOs en Swagger: `http://localhost:3001/api/docs`.
 
+## Base de datos y migraciones
+
+El esquema **nunca** lo modifica la app sola (`synchronize` está apagado): todo cambio pasa por una migración versionada
+en `src/database/migrations/`. Flujo para cambiar una entidad:
+
+```bash
+# 1. editá la entidad  2. generá la migración  3. revisala  4. aplicala
+npm run migration:generate -- src/database/migrations/AgregaCampoX
+npm run migration:run
+```
+
+- `DB_MIGRATIONS_RUN=true`: la app aplica las pendientes al arrancar (cómodo en desarrollo). En producción conviene `false` y
+  correr `npm run build && npm run migration:prod` como paso del deploy.
+- `DB_SSL=true` para Neon y otros Postgres gestionados (usar la cadena de conexión *pooled*).
+- La conexión se define una sola vez (`src/database/typeorm-options.ts`) y la comparten la app y la CLI.
+
 ## Reglas de acceso
 
 - **Personal** = usuario cuyo `cargo` (según `/sso/me`) está en `STAFF_CARGOS`. Ve el panel y todo el contenido.
@@ -76,6 +96,6 @@ Detalle y DTOs en Swagger: `http://localhost:3001/api/docs`.
 
 ## Para producción (fuera de este ejemplo)
 
-- `DB_SYNCHRONIZE=false` y migraciones de TypeORM; `COOKIE_SECURE=true` (HTTPS).
+- `COOKIE_SECURE=true` (HTTPS), `DB_SSL=true` y migraciones aplicadas en el deploy.
 - Cifrar los tokens de la tabla `sessions` en reposo y/o guardar los PDFs en un storage privado (implementar `IFileStorage`).
 - Si se corre más de una instancia, el "un refresh en vuelo" necesita un lock distribuido.
