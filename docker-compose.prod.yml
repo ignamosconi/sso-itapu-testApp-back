@@ -1,0 +1,47 @@
+# Producción: Postgres + backend. Postgres no publica ningún puerto;
+# el backend escucha solo en 127.0.0.1:3001 y Caddy (en el host) le hace de proxy en /api.
+# Uso: docker compose -f docker-compose.prod.yml up -d --build
+name: examenes-itapu-prod
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?Definí DB_NAME en el .env}
+      POSTGRES_USER: ${DB_USER:?Definí DB_USER en el .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Definí DB_PASSWORD en el .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    image: examenes-itapu-back:latest
+    restart: unless-stopped
+    # init: reenvía SIGTERM a Node para que se apague limpio en cada down/redeploy.
+    init: true
+    env_file: .env
+    # Pisan lo que diga el .env para que funcione dentro de Docker.
+    environment:
+      TZ: America/Argentina/Buenos_Aires
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_SSL: "false"
+      PORT: "3001"
+      STORAGE_DIR: /app/storage
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - pdf_storage:/app/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  pdf_storage:
