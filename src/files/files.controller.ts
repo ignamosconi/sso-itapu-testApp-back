@@ -106,7 +106,7 @@ export class FilesController implements IFilesController {
   @Get(':id/content')
   @ApiOperation({
     summary: 'Descargar/ver el PDF',
-    description: 'Personal: cualquier PDF. Alumno: solo si la carpeta es visible para su especialidad.',
+    description: 'Personal: cualquier PDF. Alumno: solo si la carpeta es visible para alguna de sus especialidades.',
   })
   @ApiProduces('application/pdf')
   @ApiOkResponse({ description: 'Contenido del PDF' })

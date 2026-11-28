@@ -8,10 +8,17 @@ describe('AccessPolicyService', () => {
 
   it('isStaff compara sin importar tildes ni mayúsculas', () => {
     const policy = build(['Profesor', 'Dirección']);
-    expect(policy.isStaff('profesor')).toBe(true);
-    expect(policy.isStaff('DIRECCION')).toBe(true);
-    expect(policy.isStaff('Alumno')).toBe(false);
-    expect(policy.isStaff(null)).toBe(false);
+    expect(policy.isStaff(['profesor'])).toBe(true);
+    expect(policy.isStaff(['DIRECCION'])).toBe(true);
+    expect(policy.isStaff(['Alumno'])).toBe(false);
+    expect(policy.isStaff([])).toBe(false);
+  });
+
+  it('isStaff alcanza con que ALGUNO de los cargos sea de personal', () => {
+    const policy = build(['Profesor']);
+    expect(policy.isStaff(['Preceptor', 'Profesor'])).toBe(true);
+    expect(policy.isStaff(['Profesor', 'Regente'])).toBe(true);
+    expect(policy.isStaff(['Preceptor', 'Regente'])).toBe(false);
   });
 
   it('al arrancar advierte de cargos que el SSO no lista, sin romper', async () => {

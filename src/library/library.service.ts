@@ -43,9 +43,9 @@ export class LibraryService implements ILibraryService {
   }
 
   private audienceFor(user: AuthUser, query: BrowseQueryDto): Audience {
-    if (!user.isStaff) return { kind: 'student', especialidad: user.especialidad };
+    if (!user.isStaff) return { kind: 'student', especialidades: user.especialidades };
     if (!query.asStudent) return { kind: 'staff' };
-    return { kind: 'student', especialidad: query.previewSpecialty ?? null };
+    return { kind: 'student', especialidades: query.previewSpecialty ? [query.previewSpecialty] : [] };
   }
 
   private breadcrumbs(current: FolderEntity | undefined, visible: Map<string, FolderEntity>): FolderDto[] {

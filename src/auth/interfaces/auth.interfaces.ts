@@ -31,8 +31,8 @@ export interface IAuthService {
 }
 
 export interface IAccessPolicy {
-  /** ¿Este cargo tiene acceso al panel de administración? */
-  isStaff(cargo: string | null): boolean;
+  /** ¿Alguno de estos cargos tiene acceso al panel de administración? */
+  isStaff(cargos: readonly string[]): boolean;
   getStaffCargos(): string[];
 }
 

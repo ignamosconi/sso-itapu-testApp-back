@@ -4,8 +4,10 @@ export interface AuthUser {
   sub: string;
   displayName: string;
   email: string | null;
-  cargo: string | null;
-  especialidad: string | null;
-  /** true si el cargo está en STAFF_CARGOS: ve el panel de administración */
+  /** Cargos según el SSO (lista, al menos uno) */
+  cargos: string[];
+  /** Especialidades según el SSO (lista, al menos una) */
+  especialidades: string[];
+  /** true si ALGUNO de sus cargos está en STAFF_CARGOS: ve el panel de administración */
   isStaff: boolean;
 }

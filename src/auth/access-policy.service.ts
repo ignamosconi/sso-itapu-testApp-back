@@ -25,8 +25,9 @@ export class AccessPolicyService implements IAccessPolicy, OnApplicationBootstra
     this.staffKeys = new Set(this.staffCargos.map(normalizeKey));
   }
 
-  isStaff(cargo: string | null): boolean {
-    return cargo !== null && this.staffKeys.has(normalizeKey(cargo));
+  /** Es staff si ALGUNO de sus cargos está en STAFF_CARGOS (por ejemplo, Profesor y Preceptor a la vez). */
+  isStaff(cargos: readonly string[]): boolean {
+    return cargos.some((cargo) => this.staffKeys.has(normalizeKey(cargo)));
   }
 
   getStaffCargos(): string[] {

@@ -6,7 +6,7 @@ import { SSO_ENDPOINTS } from './sso.constants';
 import { SsoProtocolError } from './sso.errors';
 import { ssoFetchJson } from './sso-http';
 import { SsoTokens, SsoUser } from './sso.types';
-import { extractLabel } from './utils/normalize';
+import { extractLabel, extractList } from './utils/normalize';
 
 /**
  * Cliente del SSO. Cada método corresponde a un paso del mail "Credenciales de integración".
@@ -76,8 +76,9 @@ export class SsoClientService implements ISsoClient {
       sub,
       displayName: this.pickDisplayName(raw) ?? sub,
       email: extractLabel(raw.email),
-      cargo: extractLabel(raw.cargo),
-      especialidad: extractLabel(raw.especialidad),
+      // Desde SSO v2.0.0 son listas: una persona puede ser, por ejemplo, Profesor y Preceptor.
+      cargos: extractList(raw.cargos),
+      especialidades: extractList(raw.especialidades),
     };
   }
 

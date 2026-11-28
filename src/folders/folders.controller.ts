@@ -23,7 +23,7 @@ import { FOLDERS_SERVICE, IFoldersController, IFoldersService } from './interfac
 @ApiTags('folders (admin)')
 @ApiCookieAuth()
 @ApiUnauthorizedResponse({ description: 'Sin sesión' })
-@ApiForbiddenResponse({ description: 'El cargo del usuario no es de personal' })
+@ApiForbiddenResponse({ description: 'Ninguno de los cargos del usuario es de personal' })
 @UseGuards(SessionAuthGuard, StaffGuard)
 @Controller('folders')
 export class FoldersController implements IFoldersController {

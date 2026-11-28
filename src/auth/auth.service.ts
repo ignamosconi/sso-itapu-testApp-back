@@ -71,8 +71,8 @@ export class AuthService implements IAuthService, OnModuleInit {
         refreshToken: tokens.refreshToken,
         displayName: me.displayName,
         email: me.email,
-        cargo: me.cargo,
-        especialidad: me.especialidad,
+        cargos: me.cargos,
+        especialidades: me.especialidades,
         absoluteExpiresAt: new Date(Date.now() + this.sessionMaxAgeMs),
       });
       return { sessionId: session.id, user: this.toAuthUser(session), maxAgeMs: this.sessionMaxAgeMs };
@@ -123,15 +123,15 @@ export class AuthService implements IAuthService, OnModuleInit {
     try {
       const tokens = await this.sso.refresh(session.refreshToken);
       this.tokens.validateAccessToken(tokens.accessToken);
-      // cargo y especialidad "reflejan los valores configurados por el administrador": se refrescan acá.
+      // cargos y especialidades "reflejan los valores configurados por el administrador": se refrescan acá.
       const me = await this.sso.getUserInfo(tokens.accessToken);
       const updated = await this.sessions.update(session.id, {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
         displayName: me.displayName,
         email: me.email,
-        cargo: me.cargo,
-        especialidad: me.especialidad,
+        cargos: me.cargos,
+        especialidades: me.especialidades,
       });
       if (!updated) throw new UnauthorizedException('Sesión inexistente o vencida');
       return updated;
@@ -149,9 +149,9 @@ export class AuthService implements IAuthService, OnModuleInit {
       sub: session.sub,
       displayName: session.displayName,
       email: session.email,
-      cargo: session.cargo,
-      especialidad: session.especialidad,
-      isStaff: this.policy.isStaff(session.cargo),
+      cargos: session.cargos,
+      especialidades: session.especialidades,
+      isStaff: this.policy.isStaff(session.cargos),
     };
   }
 

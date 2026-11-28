@@ -27,7 +27,7 @@ export interface IFilesService {
   findOne(id: string): Promise<PdfFileDto>;
   update(id: string, dto: UpdatePdfFileDto): Promise<PdfFileDto>;
   remove(id: string): Promise<void>;
-  /** Alumnos: solo si la carpeta es visible para su especialidad. Personal: siempre. */
+  /** Alumnos: solo si la carpeta es visible para alguna de sus especialidades. Personal: siempre. */
   getContent(id: string, user: AuthUser): Promise<PdfContent>;
 }
 

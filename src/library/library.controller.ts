@@ -19,7 +19,7 @@ export class LibraryController implements ILibraryController {
   @ApiOperation({
     summary: 'Navegar carpetas y PDFs',
     description:
-      'Alumno: solo ve carpetas habilitadas para su especialidad. Personal: ve todo, o lo que vería un alumno con ' +
+      'Alumno: solo ve carpetas habilitadas para alguna de sus especialidades. Personal: ve todo, o lo que vería un alumno con ' +
       '`asStudent=true` (y `previewSpecialty` para elegir la especialidad a previsualizar).',
   })
   @ApiOkResponse({ type: LibraryBrowseDto })

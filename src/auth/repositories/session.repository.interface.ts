@@ -4,11 +4,11 @@ export const SESSION_REPOSITORY = Symbol('SESSION_REPOSITORY');
 
 export type NewSession = Pick<
   SessionEntity,
-  'sub' | 'accessToken' | 'refreshToken' | 'displayName' | 'email' | 'cargo' | 'especialidad' | 'absoluteExpiresAt'
+  'sub' | 'accessToken' | 'refreshToken' | 'displayName' | 'email' | 'cargos' | 'especialidades' | 'absoluteExpiresAt'
 >;
 
 export type SessionPatch = Partial<
-  Pick<SessionEntity, 'accessToken' | 'refreshToken' | 'displayName' | 'email' | 'cargo' | 'especialidad'>
+  Pick<SessionEntity, 'accessToken' | 'refreshToken' | 'displayName' | 'email' | 'cargos' | 'especialidades'>
 >;
 
 export interface ISessionRepository {
