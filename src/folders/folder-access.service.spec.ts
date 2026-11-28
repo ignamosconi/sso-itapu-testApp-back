@@ -19,22 +19,27 @@ describe('FolderAccessService', () => {
   });
 
   it('un alumno de la especialidad ve la carpeta y lo que hereda', async () => {
-    const visible = await service.getVisibleFolders({ kind: 'student', especialidad: 'informatica' }); // sin tilde/minúscula
+    const visible = await service.getVisibleFolders({ kind: 'student', especialidades: ['informatica'] }); // sin tilde/minúscula
     expect([...visible.keys()].sort()).toEqual(['g', 'i', 'm', 'y']);
   });
 
   it('otro alumno no ve la carpeta restringida NI sus subcarpetas', async () => {
-    const visible = await service.getVisibleFolders({ kind: 'student', especialidad: 'Electrónica' });
+    const visible = await service.getVisibleFolders({ kind: 'student', especialidades: ['Electrónica'] });
     expect([...visible.keys()].sort()).toEqual(['g', 'y']);
   });
 
-  it('un alumno sin especialidad solo ve lo público', async () => {
-    const visible = await service.getVisibleFolders({ kind: 'student', especialidad: null });
+  it('con varias especialidades alcanza con que ALGUNA esté habilitada', async () => {
+    const visible = await service.getVisibleFolders({ kind: 'student', especialidades: ['Electrónica', 'Informática'] });
+    expect([...visible.keys()].sort()).toEqual(['g', 'i', 'm', 'y']);
+  });
+
+  it('un alumno sin especialidades (o una vista previa sin elegir) solo ve lo público', async () => {
+    const visible = await service.getVisibleFolders({ kind: 'student', especialidades: [] });
     expect([...visible.keys()].sort()).toEqual(['g', 'y']);
   });
 
   it('canView: raíz siempre visible; carpeta oculta no', async () => {
-    const other = { kind: 'student', especialidad: 'Electrónica' } as const;
+    const other = { kind: 'student' as const, especialidades: ['Electrónica'] };
     await expect(service.canView(null, other)).resolves.toBe(true);
     await expect(service.canView('m', other)).resolves.toBe(false);
     await expect(service.canView('m', { kind: 'staff' })).resolves.toBe(true);

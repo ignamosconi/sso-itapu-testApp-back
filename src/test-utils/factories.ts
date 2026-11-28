@@ -42,8 +42,8 @@ export const makeSession = (overrides: Partial<SessionEntity> = {}): SessionEnti
     refreshToken: 'r',
     displayName: 'Ana Pérez',
     email: null,
-    cargo: 'Profesor',
-    especialidad: null,
+    cargos: ['Profesor'],
+    especialidades: ['ITAPU'],
     absoluteExpiresAt: new Date(Date.now() + 3600_000),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -54,8 +54,8 @@ export const staffUser: AuthUser = {
   sub: 'u-staff',
   displayName: 'Profe',
   email: null,
-  cargo: 'Profesor',
-  especialidad: null,
+  cargos: ['Preceptor', 'Profesor'],
+  especialidades: ['ITAPU'],
   isStaff: true,
 };
 
@@ -63,8 +63,8 @@ export const studentUser: AuthUser = {
   sub: 'u-student',
   displayName: 'Alumno',
   email: null,
-  cargo: 'Alumno',
-  especialidad: 'Informática',
+  cargos: ['Alumno'],
+  especialidades: ['Informática'],
   isStaff: false,
 };
 

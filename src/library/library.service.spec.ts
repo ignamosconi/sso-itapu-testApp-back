@@ -41,6 +41,11 @@ describe('LibraryService', () => {
     expect(result.folders.map((f) => f.name)).toEqual(['Informática']);
   });
 
+  it('un alumno con varias especialidades ve las carpetas de todas ellas', async () => {
+    const result = await service.browse({ ...studentUser, especialidades: ['Electrónica', 'Informática'] }, { folderId: 'y' });
+    expect(result.folders.map((f) => f.name).sort()).toEqual(['Electrónica', 'Informática']);
+  });
+
   it('un alumno que pide una carpeta oculta recibe 404', async () => {
     await expect(service.browse(studentUser, { folderId: 'e' })).rejects.toBeInstanceOf(NotFoundException);
   });

@@ -6,8 +6,8 @@ describe('SessionRepository', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('create genera un id opaco y largo (256 bits)', async () => {
-    const a = await repo.create({ sub: 'u', accessToken: 'a', refreshToken: 'r', displayName: 'n', email: null, cargo: null, especialidad: null, absoluteExpiresAt: new Date() });
-    const b = await repo.create({ sub: 'u', accessToken: 'a', refreshToken: 'r', displayName: 'n', email: null, cargo: null, especialidad: null, absoluteExpiresAt: new Date() });
+    const a = await repo.create({ sub: 'u', accessToken: 'a', refreshToken: 'r', displayName: 'n', email: null, cargos: [], especialidades: [], absoluteExpiresAt: new Date() });
+    const b = await repo.create({ sub: 'u', accessToken: 'a', refreshToken: 'r', displayName: 'n', email: null, cargos: [], especialidades: [], absoluteExpiresAt: new Date() });
     expect(a.id).toHaveLength(43);
     expect(a.id).not.toEqual(b.id);
   });

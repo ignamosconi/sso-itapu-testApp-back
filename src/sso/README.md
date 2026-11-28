@@ -22,7 +22,7 @@ Si el SSO cambia (otra URL, nuevas credenciales, otro formato), se toca **`.env`
 | **1. Abrir popup de login** | `sso-client.service.ts` → `buildLoginUrl()` | Arma `/sso/login?client_id&redirect_uri&state&theme`. La abre el front (ver `front/src/sso`) |
 | **2. Escuchar postMessage** | *(front)* `front/src/sso/ssoLogin.ts` | Verifica `event.origin` y `state`. El backend aporta el `state` y el origen del SSO vía `GET /api/auth/sso/login-url` y lo re-verifica contra una cookie HttpOnly en el callback |
 | **3. Canjear code por tokens** | `sso-client.service.ts` → `exchangeCode()` + `sso-token-validator.service.ts` | `POST /sso/token` desde el backend; luego se validan `iss`, `aud` y `exp` del JWT |
-| **4. Identificar al usuario** | `sso-client.service.ts` → `getUserInfo()` | `GET /sso/me` con Bearer. Usa `sub` como ID, exige `aud == client_id`, lee `cargo` y `especialidad` |
+| **4. Identificar al usuario** | `sso-client.service.ts` → `getUserInfo()` | `GET /sso/me` con Bearer. Usa `sub` como ID, exige `aud == client_id`, lee las listas `cargos` y `especialidades` (SSO v2.0.0) |
 | **5. Renovar tokens** | `sso-client.service.ts` → `refresh()` (orquestado en `auth/auth.service.ts`) | `POST /sso/refresh`. Se reemplazan ambos tokens. Un solo refresh en vuelo por sesión (evita el 401 por pedidos simultáneos). Un 4xx ⇒ sesión revocada |
 | **6. Cerrar sesión** | `sso-client.service.ts` → `logout()` | `POST /sso/logout` y se borra la sesión local |
 | **Seguridad: tokens fuera de localStorage** | `auth/` | Los tokens viven en la base (tabla `sessions`); al navegador solo llega una cookie HttpOnly con un ID opaco |
@@ -42,4 +42,4 @@ Si el SSO cambia (otra URL, nuevas credenciales, otro formato), se toca **`.env`
 
 - **400 al canjear el code**: revisá `SSO_REDIRECT_URI` (debe ser idéntica a la del login) y si el SSO espera `client_id` como número en vez de string (`sso-client.service.ts`).
 - **Cargos/especialidades vacíos**: ajustá `utils/normalize.ts` al formato real de `/sso/info/*`.
-- **El panel de admin no aparece**: `STAFF_CARGOS` debe contener el cargo tal cual lo devuelve `domain-roles`. Al arrancar, el backend loguea los valores disponibles.
+- **El panel de admin no aparece**: `STAFF_CARGOS` debe contener alguno de los cargos del usuario tal cual lo devuelve `domain-roles` (alcanza con uno). Al arrancar, el backend loguea los valores disponibles.

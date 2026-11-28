@@ -55,7 +55,7 @@ Los servicios reciben sus dependencias por token (`@Inject(FOLDER_REPOSITORY)`),
 | Biblioteca | `GET /api/library/browse?folderId&asStudent&previewSpecialty` | sesión |
 | Carpetas | `POST/GET/GET:id/PATCH:id/DELETE:id /api/folders` | personal |
 | PDFs | `POST /api/files` · `GET/PATCH/DELETE /api/files/:id` | personal |
-| PDF (contenido) | `GET /api/files/:id/content` | sesión (alumno: solo si la carpeta es visible para su especialidad) |
+| PDF (contenido) | `GET /api/files/:id/content` | sesión (alumno: solo si la carpeta es visible para alguna de sus especialidades) |
 | Directorio | `GET /api/directory` | personal |
 
 Detalle y DTOs en Swagger: `http://localhost:3001/api/docs`.
@@ -71,6 +71,10 @@ npm run migration:generate -- src/database/migrations/AgregaCampoX
 npm run migration:run
 ```
 
+> **v2.0.0:** la migración `MultipleRolesSpecialties` cambia `sessions.cargo`/`especialidad` por las listas
+> `cargos`/`especialidades` (jsonb) y **borra las sesiones existentes**: todos vuelven a iniciar sesión una vez.
+> Requiere el SSO v2.0.0 o posterior.
+
 - `DB_MIGRATIONS_RUN=true`: la app aplica las pendientes al arrancar (cómodo en desarrollo). En producción conviene `false` y
   correr `npm run build && npm run migration:prod` como paso del deploy.
 - `DB_SSL=true` para Neon y otros Postgres gestionados (usar la cadena de conexión *pooled*).
@@ -78,10 +82,13 @@ npm run migration:run
 
 ## Reglas de acceso
 
-- **Personal** = usuario cuyo `cargo` (según `/sso/me`) está en `STAFF_CARGOS`. Ve el panel y todo el contenido.
+- Desde SSO v2.0.0, `/sso/me` devuelve **listas**: `cargos` y `especialidades` (una persona puede ser, por ejemplo,
+  Profesor y Preceptor). Se guardan en la sesión y se actualizan con cada renovación del token (hasta 15 minutos).
+- **Personal** = usuario con **alguno** de sus `cargos` en `STAFF_CARGOS`. Ve el panel y todo el contenido.
   Al arrancar, el backend contrasta `STAFF_CARGOS` con `/sso/info/domain-roles` y avisa si un valor no existe.
-- **Alumno** = cualquier otro cargo. Solo navega y descarga. Una carpeta con `allowedSpecialties` vacío es visible
-  para todos; con valores, solo para esas especialidades (y la restricción se hereda a sus subcarpetas y PDFs).
+- **Alumno** = ninguno de sus cargos es de personal. Solo navega y descarga. Una carpeta con `allowedSpecialties` vacío
+  es visible para todos; con valores, para quien tenga **alguna** de esas especialidades (y la restricción se hereda a
+  sus subcarpetas y PDFs).
   Lo que no puede ver, para él **no existe** (404).
 - Las especialidades de las carpetas se validan contra `/sso/info/specialties`. No hay cargos ni especialidades hardcodeados.
 

@@ -102,7 +102,7 @@ describe('FilesService', () => {
     it('un alumno sin permiso recibe 404 (no se revela que existe) y no se abre el archivo', async () => {
       access.canView.mockResolvedValue(false);
       await expect(service.getContent('p-1', studentUser)).rejects.toBeInstanceOf(NotFoundException);
-      expect(access.canView).toHaveBeenCalledWith('f-1', { kind: 'student', especialidad: 'Informática' });
+      expect(access.canView).toHaveBeenCalledWith('f-1', { kind: 'student', especialidades: ['Informática'] });
       expect(storage.openReadStream).not.toHaveBeenCalled();
     });
   });

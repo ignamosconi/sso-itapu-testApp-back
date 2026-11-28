@@ -14,8 +14,8 @@ describe('AuthService', () => {
   };
   const tokens = { validateAccessToken: jest.fn(), isExpiringSoon: jest.fn().mockReturnValue(false) };
   const sessions = { create: jest.fn(), findById: jest.fn(), update: jest.fn(), delete: jest.fn(), deleteExpired: jest.fn() };
-  const policy = { isStaff: jest.fn((cargo: string | null) => cargo === 'Profesor'), getStaffCargos: jest.fn() };
-  const me = { sub: 'u-1', displayName: 'Ana', email: null, cargo: 'Profesor', especialidad: null };
+  const policy = { isStaff: jest.fn((cargos: readonly string[]) => cargos.includes('Profesor')), getStaffCargos: jest.fn() };
+  const me = { sub: 'u-1', displayName: 'Ana', email: null, cargos: ['Preceptor', 'Profesor'], especialidades: ['Sistemas'] };
 
   let service: AuthService;
   beforeEach(() => {
@@ -83,7 +83,7 @@ describe('AuthService', () => {
     it('devuelve el usuario sin refrescar si el access_token está vigente', async () => {
       sessions.findById.mockResolvedValue(makeSession());
       const user = await service.resolveUser('sid-1');
-      expect(user).toMatchObject({ sub: 'u-1', cargo: 'Profesor', isStaff: true });
+      expect(user).toMatchObject({ sub: 'u-1', cargos: ['Profesor'], isStaff: true });
       expect(sso.refresh).not.toHaveBeenCalled();
     });
 
@@ -91,13 +91,13 @@ describe('AuthService', () => {
       tokens.isExpiringSoon.mockReturnValue(true);
       sessions.findById.mockResolvedValue(makeSession());
       sso.refresh.mockResolvedValue({ accessToken: 'A2', refreshToken: 'R2' });
-      sso.getUserInfo.mockResolvedValue({ ...me, cargo: 'Alumno' });
-      sessions.update.mockResolvedValue(makeSession({ accessToken: 'A2', refreshToken: 'R2', cargo: 'Alumno' }));
+      sso.getUserInfo.mockResolvedValue({ ...me, cargos: ['Alumno'] });
+      sessions.update.mockResolvedValue(makeSession({ accessToken: 'A2', refreshToken: 'R2', cargos: ['Alumno'] }));
 
       const user = await service.resolveUser('sid-1');
 
       expect(sso.refresh).toHaveBeenCalledWith('r');
-      expect(sessions.update).toHaveBeenCalledWith('sid-1', expect.objectContaining({ accessToken: 'A2', refreshToken: 'R2', cargo: 'Alumno' }));
+      expect(sessions.update).toHaveBeenCalledWith('sid-1', expect.objectContaining({ accessToken: 'A2', refreshToken: 'R2', cargos: ['Alumno'], especialidades: ['Sistemas'] }));
       expect(user.isStaff).toBe(false); // el cargo cambió en el SSO y se refleja
     });
 

@@ -11,13 +11,13 @@ export class SessionUserDto {
   @ApiProperty({ nullable: true, type: String })
   email: string | null;
 
-  @ApiProperty({ nullable: true, type: String, description: 'Cargo según el SSO' })
-  cargo: string | null;
+  @ApiProperty({ type: [String], example: ['Preceptor', 'Profesor'], description: 'Cargos según el SSO (al menos uno)' })
+  cargos: string[];
 
-  @ApiProperty({ nullable: true, type: String, description: 'Especialidad según el SSO' })
-  especialidad: string | null;
+  @ApiProperty({ type: [String], example: ['Sistemas'], description: 'Especialidades según el SSO (al menos una)' })
+  especialidades: string[];
 
-  @ApiProperty({ description: 'true si ve el panel de administración (cargo en STAFF_CARGOS)' })
+  @ApiProperty({ description: 'true si ve el panel de administración (ALGUNO de sus cargos está en STAFF_CARGOS)' })
   isStaff: boolean;
 }
 
@@ -25,7 +25,7 @@ export const toSessionUserDto = (user: AuthUser): SessionUserDto => ({
   sub: user.sub,
   displayName: user.displayName,
   email: user.email,
-  cargo: user.cargo,
-  especialidad: user.especialidad,
+  cargos: user.cargos,
+  especialidades: user.especialidades,
   isStaff: user.isStaff,
 });

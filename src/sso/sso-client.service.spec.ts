@@ -60,13 +60,25 @@ describe('SsoClientService', () => {
     await expect(client.exchangeCode('c')).rejects.toBeInstanceOf(SsoUnavailableError);
   });
 
-  it('getUserInfo usa Bearer y normaliza cargo/especialidad (string u objeto)', async () => {
+  it('getUserInfo usa Bearer y lee cargos/especialidades como listas (strings u objetos)', async () => {
     fetchMock.mockResolvedValue(
-      jsonResponse({ sub: 'u-9', aud: '30', nombre: 'Ana', apellido: 'Pérez', cargo: { name: 'Profesor' }, especialidad: 'Informática' }),
+      jsonResponse({
+        sub: 'u-9', aud: '30', nombre: 'Ana', apellido: 'Pérez',
+        cargos: [{ name: 'Preceptor' }, 'Profesor'], especialidades: ['Informática'],
+      }),
     );
     const user = await client.getUserInfo('tok');
     expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe('Bearer tok');
-    expect(user).toEqual({ sub: 'u-9', displayName: 'Ana Pérez', email: null, cargo: 'Profesor', especialidad: 'Informática' });
+    expect(user).toEqual({
+      sub: 'u-9', displayName: 'Ana Pérez', email: null, cargos: ['Preceptor', 'Profesor'], especialidades: ['Informática'],
+    });
+  });
+
+  it('getUserInfo ignora los campos sueltos del formato viejo (cargo/especialidad)', async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ sub: 'u-9', aud: '30', cargo: 'Profesor', especialidad: 'Informática' }));
+    const user = await client.getUserInfo('tok');
+    expect(user.cargos).toEqual([]);
+    expect(user.especialidades).toEqual([]);
   });
 
   it('getUserInfo exige aud == client_id', async () => {

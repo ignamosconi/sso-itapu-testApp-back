@@ -25,11 +25,13 @@ export class SessionEntity {
   @Column({ type: 'varchar', length: 200, nullable: true })
   email: string | null;
 
-  @Column({ type: 'varchar', length: 120, nullable: true })
-  cargo: string | null;
+  /** Cargos según /sso/me (se refrescan con cada renovación del token). */
+  @Column({ type: 'jsonb', default: () => "'[]'" })
+  cargos: string[];
 
-  @Column({ type: 'varchar', length: 120, nullable: true })
-  especialidad: string | null;
+  /** Especialidades según /sso/me (se refrescan con cada renovación del token). */
+  @Column({ type: 'jsonb', default: () => "'[]'" })
+  especialidades: string[];
 
   @Column({ type: 'timestamptz', name: 'absolute_expires_at' })
   absoluteExpiresAt: Date;

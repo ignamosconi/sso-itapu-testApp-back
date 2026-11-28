@@ -9,8 +9,10 @@ export interface SsoUser {
   sub: string;
   displayName: string;
   email: string | null;
-  cargo: string | null;
-  especialidad: string | null;
+  /** Cargos del usuario (lista; el SSO garantiza al menos uno). */
+  cargos: string[];
+  /** Especialidades del usuario (lista; el SSO garantiza al menos una). */
+  especialidades: string[];
 }
 
 export interface SsoTokenClaims {

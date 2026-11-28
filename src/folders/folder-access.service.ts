@@ -6,8 +6,8 @@ import { IFolderAccessService } from './interfaces/folders.interfaces';
 import { FOLDER_REPOSITORY, IFolderRepository } from './repositories/folder.repository.interface';
 
 /**
- * Regla de visibilidad: un alumno ve una carpeta si ella y TODOS sus ancestros están habilitados para su
- * especialidad (lista vacía = habilitada para todos). El personal ve todo.
+ * Regla de visibilidad: un alumno ve una carpeta si ella y TODOS sus ancestros están habilitados para
+ * ALGUNA de sus especialidades (lista vacía = habilitada para todos). El personal ve todo.
  */
 @Injectable()
 export class FolderAccessService implements IFolderAccessService {
@@ -18,7 +18,7 @@ export class FolderAccessService implements IFolderAccessService {
     const byId = new Map(all.map((folder) => [folder.id, folder]));
     if (audience.kind === 'staff') return byId;
 
-    const studentKey = audience.especialidad ? normalizeKey(audience.especialidad) : null;
+    const studentKeys = new Set(audience.especialidades.map(normalizeKey));
     const memo = new Map<string, boolean>();
 
     const isVisible = (folder: FolderEntity): boolean => {
@@ -26,7 +26,7 @@ export class FolderAccessService implements IFolderAccessService {
       if (cached !== undefined) return cached;
 
       const allowed = folder.allowedSpecialties ?? [];
-      const selfOk = allowed.length === 0 || (studentKey !== null && allowed.some((s) => normalizeKey(s) === studentKey));
+      const selfOk = allowed.length === 0 || allowed.some((s) => studentKeys.has(normalizeKey(s)));
       const parent = folder.parentId ? byId.get(folder.parentId) : undefined;
       const visible = selfOk && (folder.parentId === null || (parent !== undefined && isVisible(parent)));
 
